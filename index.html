@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cuaca Hari Ini & Riwayat</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h2>Cuaca Hari Ini</h2>
-  <div class="weather-today" id="weather-today"></div>
+  <h1>Info Cuaca</h1>
 
-  <h3>Pilih Tanggal (30 Hari Terakhir):</h3>
-  <input type="date" id="date-picker" max="" />
+  <section>
+    <h2>Cuaca Hari Ini (Otomatis Lokasi)</h2>
+    <div id="weather-today"></div>
+  </section>
 
-  <div id="selected-weather" class="weather-container"></div>
+  <section>
+    <h2>Pilih Tanggal (maks. 30 hari ke belakang)</h2>
+    <input type="date" id="date-picker" />
+    <div id="selected-weather"></div>
+  </section>
 
   <script src="script.js"></script>
 </body>
