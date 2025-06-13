@@ -1,7 +1,6 @@
-let LAT = -6.2;
+let LAT = -6.2;  // default Jakarta
 let LON = 106.8;
 
-// Fungsi ubah kode cuaca menjadi kategori Indonesia + ikon
 function mapWeatherToIndoCategory(code) {
   if ([0, 1].includes(code)) return { label: "Cerah", icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png" };
   if ([2, 3, 45, 48].includes(code)) return { label: "Berawan", icon: "https://cdn-icons-png.flaticon.com/512/414/414825.png" };
@@ -14,14 +13,28 @@ function mapWeatherToIndoCategory(code) {
   return { label: `Kode tidak dikenali (${code})`, icon: "https://cdn-icons-png.flaticon.com/512/414/414825.png" };
 }
 
-// Ambil data cuaca dari Open-Meteo berdasarkan tanggal
 async function fetchWeather(date) {
   const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${LAT}&longitude=${LON}&start_date=${date}&end_date=${date}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`;
   const res = await fetch(url);
   return await res.json();
 }
 
-// Setup kalender dan tampilkan cuaca berdasarkan tanggal
+function setupMap() {
+  const map = L.map('map').setView([LAT, LON], 8);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+
+  let marker = L.marker([LAT, LON]).addTo(map);
+
+  map.on('click', function (e) {
+    LAT = e.latlng.lat;
+    LON = e.latlng.lng;
+    marker.setLatLng(e.latlng);
+    console.log(`Lokasi dipilih: ${LAT}, ${LON}`);
+  });
+}
+
 function setupDatePicker() {
   const input = document.getElementById('date-picker');
   const today = new Date();
@@ -51,5 +64,5 @@ function setupDatePicker() {
   });
 }
 
-// Inisialisasi
+setupMap();
 setupDatePicker();
