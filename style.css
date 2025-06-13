@@ -16,6 +16,13 @@ button {
   cursor: pointer;
 }
 
+.info-kecil {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+  margin-bottom: 12px;
+}
+
 .weather-card {
   border: 1px solid #ccc;
   border-radius: 10px;
