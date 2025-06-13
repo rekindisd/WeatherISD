@@ -14,23 +14,54 @@ function mapWeatherToIndoCategory(code) {
 }
 
 async function fetchTodayWeather() {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`;
-  const res = await fetch(url);
-  const data = await res.json();
+  const urlDaily = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`;
+  const resDaily = await fetch(urlDaily);
+  const dataDaily = await resDaily.json();
 
-  const date = data.daily.time[0];
-  const code = data.daily.weathercode[0];
-  const max = data.daily.temperature_2m_max[0];
-  const min = data.daily.temperature_2m_min[0];
-  const { label, icon } = mapWeatherToIndoCategory(code);
+  const today = new Date().toISOString().split("T")[0];
+  const indexToday = dataDaily.daily?.time?.indexOf(today);
 
-  document.getElementById('today-weather').innerHTML = `
-    <div class="weather-card">
-      <div class="date">Hari ini (${date})</div>
-      <img src="${icon}" alt="ikon cuaca">
-      <div class="temp">${label}<br>Max: ${max}°C<br>Min: ${min}°C</div>
-    </div>
-  `;
+  if (indexToday !== -1 && dataDaily.daily.weathercode[indexToday] !== undefined) {
+    const code = dataDaily.daily.weathercode[indexToday];
+    const max = dataDaily.daily.temperature_2m_max[indexToday];
+    const min = dataDaily.daily.temperature_2m_min[indexToday];
+    const { label, icon } = mapWeatherToIndoCategory(code);
+
+    document.getElementById('today-weather').innerHTML = `
+      <div class="weather-card">
+        <div class="date">Hari ini (${today})</div>
+        <img src="${icon}" alt="ikon cuaca">
+        <div class="temp">${label}<br>Max: ${max}°C<br>Min: ${min}°C</div>
+      </div>
+    `;
+  } else {
+    // fallback ke hourly
+    const urlHourly = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&hourly=temperature_2m,weathercode&timezone=auto`;
+    const resHourly = await fetch(urlHourly);
+    const dataHourly = await resHourly.json();
+
+    const now = new Date();
+    const nowHour = now.getHours();
+    const todayStr = now.toISOString().split("T")[0];
+    const hourlyTime = dataHourly.hourly.time;
+    const index = hourlyTime.findIndex(t => t.startsWith(todayStr) && t.includes(`${String(nowHour).padStart(2, '0')}:00`));
+
+    if (index !== -1) {
+      const temp = dataHourly.hourly.temperature_2m[index];
+      const code = dataHourly.hourly.weathercode[index];
+      const { label, icon } = mapWeatherToIndoCategory(code);
+
+      document.getElementById('today-weather').innerHTML = `
+        <div class="weather-card">
+          <div class="date">Hari ini (${todayStr}, pukul ${nowHour}:00)</div>
+          <img src="${icon}" alt="ikon cuaca">
+          <div class="temp">${label}<br>Suhu: ${temp}°C</div>
+        </div>
+      `;
+    } else {
+      document.getElementById('today-weather').innerHTML = `<p>Data cuaca belum tersedia untuk jam ini.</p>`;
+    }
+  }
 }
 
 async function fetchWeather(date) {
