@@ -5,6 +5,16 @@ body {
   padding: 20px;
 }
 
+#map {
+  height: 300px;
+  width: 100%;
+  max-width: 600px;
+  margin: auto;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
 .weather-card {
   border: 1px solid #ccc;
   border-radius: 10px;
