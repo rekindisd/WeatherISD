@@ -13,6 +13,26 @@ function mapWeatherToIndoCategory(code) {
   return { label: `Kode tidak dikenali (${code})`, icon: "https://cdn-icons-png.flaticon.com/512/414/414825.png" };
 }
 
+async function fetchTodayWeather() {
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`;
+  const res = await fetch(url);
+  const data = await res.json();
+
+  const date = data.daily.time[0];
+  const code = data.daily.weathercode[0];
+  const max = data.daily.temperature_2m_max[0];
+  const min = data.daily.temperature_2m_min[0];
+  const { label, icon } = mapWeatherToIndoCategory(code);
+
+  document.getElementById('today-weather').innerHTML = `
+    <div class="weather-card">
+      <div class="date">Hari ini (${date})</div>
+      <img src="${icon}" alt="ikon cuaca">
+      <div class="temp">${label}<br>Max: ${max}°C<br>Min: ${min}°C</div>
+    </div>
+  `;
+}
+
 async function fetchWeather(date) {
   const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${LAT}&longitude=${LON}&start_date=${date}&end_date=${date}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`;
   const res = await fetch(url);
@@ -57,6 +77,7 @@ async function searchLocationByName(name) {
     LAT = parseFloat(data[0].lat);
     LON = parseFloat(data[0].lon);
     document.getElementById("location-result").textContent = `Lokasi ditemukan: ${data[0].display_name}`;
+    fetchTodayWeather(); // perbarui cuaca hari ini berdasarkan lokasi baru
   } else {
     document.getElementById("location-result").textContent = "Lokasi tidak ditemukan.";
   }
@@ -74,3 +95,4 @@ function setupLocationSearch() {
 // Inisialisasi
 setupLocationSearch();
 setupDatePicker();
+fetchTodayWeather(); // tampilkan cuaca hari ini saat load
