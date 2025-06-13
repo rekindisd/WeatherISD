@@ -1,4 +1,4 @@
-let LAT = -6.2;  // default Jakarta
+let LAT = -6.2;
 let LON = 106.8;
 
 function mapWeatherToIndoCategory(code) {
@@ -17,22 +17,6 @@ async function fetchWeather(date) {
   const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${LAT}&longitude=${LON}&start_date=${date}&end_date=${date}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`;
   const res = await fetch(url);
   return await res.json();
-}
-
-function setupMap() {
-  const map = L.map('map').setView([LAT, LON], 8);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap'
-  }).addTo(map);
-
-  let marker = L.marker([LAT, LON]).addTo(map);
-
-  map.on('click', function (e) {
-    LAT = e.latlng.lat;
-    LON = e.latlng.lng;
-    marker.setLatLng(e.latlng);
-    console.log(`Lokasi dipilih: ${LAT}, ${LON}`);
-  });
 }
 
 function setupDatePicker() {
@@ -64,5 +48,28 @@ function setupDatePicker() {
   });
 }
 
-setupMap();
+async function searchLocationByName(name) {
+  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name)}&format=json&limit=1`;
+  const res = await fetch(url);
+  const data = await res.json();
+
+  if (data.length > 0) {
+    LAT = parseFloat(data[0].lat);
+    LON = parseFloat(data[0].lon);
+    document.getElementById("location-result").textContent = `Lokasi ditemukan: ${data[0].display_name}`;
+  } else {
+    document.getElementById("location-result").textContent = "Lokasi tidak ditemukan.";
+  }
+}
+
+function setupLocationSearch() {
+  document.getElementById('search-button').addEventListener('click', () => {
+    const locationName = document.getElementById('location-input').value;
+    if (locationName.trim() !== "") {
+      searchLocationByName(locationName);
+    }
+  });
+}
+
+setupLocationSearch();
 setupDatePicker();
