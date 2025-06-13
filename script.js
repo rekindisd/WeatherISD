@@ -23,7 +23,7 @@ function setupDatePicker() {
   const input = document.getElementById('date-picker');
   const today = new Date();
   const maxDate = today.toISOString().split('T')[0];
-  const minDate = new Date(today.setDate(today.getDate() - 30)).toISOString().split('T')[0];
+  const minDate = new Date(today.setFullYear(today.getFullYear() - 1)).toISOString().split('T')[0];
 
   input.max = maxDate;
   input.min = minDate;
@@ -71,5 +71,6 @@ function setupLocationSearch() {
   });
 }
 
+// Inisialisasi
 setupLocationSearch();
 setupDatePicker();
