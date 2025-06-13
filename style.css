@@ -1,98 +1,51 @@
-let LAT = -6.2;
-let LON = 106.8;
-
-function mapWeatherToIndoCategory(code) {
-  if ([0, 1].includes(code)) return { label: "Cerah", icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png" };
-  if ([2, 3, 45, 48].includes(code)) return { label: "Berawan", icon: "https://cdn-icons-png.flaticon.com/512/414/414825.png" };
-  if ([51, 53, 55, 56, 57, 61, 63, 66, 67, 71, 73, 77, 80, 81, 85, 86].includes(code)) {
-    return { label: "Hujan Ringan", icon: "https://cdn-icons-png.flaticon.com/512/1163/1163657.png" };
-  }
-  if ([65, 82, 95, 96, 99].includes(code)) {
-    return { label: "Hujan Lebat", icon: "https://cdn-icons-png.flaticon.com/512/1146/1146869.png" };
-  }
-  return { label: `Kode tidak dikenali (${code})`, icon: "https://cdn-icons-png.flaticon.com/512/414/414825.png" };
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background: #f2f2f2;
+  padding: 20px;
 }
 
-async function fetchTodayWeather() {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`;
-  const res = await fetch(url);
-  const data = await res.json();
-
-  const date = data.daily.time[0];
-  const code = data.daily.weathercode[0];
-  const max = data.daily.temperature_2m_max[0];
-  const min = data.daily.temperature_2m_min[0];
-  const { label, icon } = mapWeatherToIndoCategory(code);
-
-  document.getElementById('today-weather').innerHTML = `
-    <div class="weather-card">
-      <div class="date">Hari ini (${date})</div>
-      <img src="${icon}" alt="ikon cuaca">
-      <div class="temp">${label}<br>Max: ${max}°C<br>Min: ${min}°C</div>
-    </div>
-  `;
+input[type="text"], input[type="date"] {
+  padding: 8px;
+  width: 220px;
 }
 
-async function fetchWeather(date) {
-  const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${LAT}&longitude=${LON}&start_date=${date}&end_date=${date}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`;
-  const res = await fetch(url);
-  return await res.json();
+button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  cursor: pointer;
 }
 
-function setupDatePicker() {
-  const input = document.getElementById('date-picker');
-  const today = new Date();
-  const maxDate = today.toISOString().split('T')[0];
-  const minDate = new Date(today.setFullYear(today.getFullYear() - 1)).toISOString().split('T')[0];
-
-  input.max = maxDate;
-  input.min = minDate;
-
-  input.addEventListener('change', async () => {
-    const date = input.value;
-    if (!date) return;
-
-    const data = await fetchWeather(date);
-    const code = data.daily.weathercode[0];
-    const max = data.daily.temperature_2m_max[0];
-    const min = data.daily.temperature_2m_min[0];
-    const { label, icon } = mapWeatherToIndoCategory(code);
-
-    document.getElementById('selected-weather').innerHTML = `
-      <div class="weather-card">
-        <div class="date">${date}</div>
-        <img src="${icon}" alt="ikon cuaca">
-        <div class="temp">${label}<br>Max: ${max}°C<br>Min: ${min}°C</div>
-      </div>
-    `;
-  });
+.info-kecil {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+  margin-bottom: 12px;
 }
 
-async function searchLocationByName(name) {
-  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name)}&format=json&limit=1`;
-  const res = await fetch(url);
-  const data = await res.json();
-
-  if (data.length > 0) {
-    LAT = parseFloat(data[0].lat);
-    LON = parseFloat(data[0].lon);
-    document.getElementById("location-result").textContent = `Lokasi ditemukan: ${data[0].display_name}`;
-    fetchTodayWeather(); // perbarui cuaca hari ini berdasarkan lokasi baru
-  } else {
-    document.getElementById("location-result").textContent = "Lokasi tidak ditemukan.";
-  }
+.weather-card {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 12px;
+  margin: 10px auto;
+  width: 220px;
+  text-align: center;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-function setupLocationSearch() {
-  document.getElementById('search-button').addEventListener('click', () => {
-    const locationName = document.getElementById('location-input').value;
-    if (locationName.trim() !== "") {
-      searchLocationByName(locationName);
-    }
-  });
+.weather-card .date {
+  font-weight: bold;
+  margin-bottom: 8px;
 }
 
-// Inisialisasi
-setupLocationSearch();
-setupDatePicker();
-fetchTodayWeather(); // tampilkan cuaca hari ini saat load
+.weather-card img {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 8px;
+}
+
+.weather-card .temp {
+  font-size: 14px;
+  color: #333;
+}
