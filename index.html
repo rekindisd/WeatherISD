@@ -3,11 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Info Cuaca Riwayat</title>
+  <title>Info Cuaca Berdasarkan Lokasi & Tanggal</title>
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Leaflet.js CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
-  <h1>Info Cuaca Berdasarkan Tanggal</h1>
+  <h1>Info Cuaca</h1>
+
+  <section>
+    <h2>Pilih Lokasi di Peta</h2>
+    <div id="map"></div>
+  </section>
 
   <section>
     <h2>Pilih Tanggal (maks. 30 hari ke belakang)</h2>
