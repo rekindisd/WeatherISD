@@ -21,33 +21,6 @@ async function fetchWeather(date) {
   return await res.json();
 }
 
-// Ambil nama lokasi dari koordinat (reverse geocoding)
-async function getLocationName(lat, lon) {
-  const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
-  const res = await fetch(url);
-  const data = await res.json();
-  const address = data.address;
-  return address.city || address.town || address.village || address.county || "Lokasi Tidak Dikenal";
-}
-
-// Tampilkan cuaca hari ini
-async function showTodayWeather() {
-  const today = new Date().toISOString().split('T')[0];
-  const data = await fetchWeather(today);
-  const code = data.daily.weathercode[0];
-  const max = data.daily.temperature_2m_max[0];
-  const min = data.daily.temperature_2m_min[0];
-  const { label, icon } = mapWeatherToIndoCategory(code);
-
-  document.getElementById('weather-today').innerHTML = `
-    <div class="weather-card">
-      <div class="date">${today}</div>
-      <img src="${icon}" alt="ikon cuaca">
-      <div class="temp">${label}<br>Max: ${max}°C<br>Min: ${min}°C</div>
-    </div>
-  `;
-}
-
 // Setup kalender dan tampilkan cuaca berdasarkan tanggal
 function setupDatePicker() {
   const input = document.getElementById('date-picker');
@@ -78,34 +51,5 @@ function setupDatePicker() {
   });
 }
 
-// Deteksi lokasi pengguna
-function detectLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        LAT = pos.coords.latitude;
-        LON = pos.coords.longitude;
-        const locationName = await getLocationName(LAT, LON);
-        document.querySelector("h2").innerHTML = `Cuaca Hari Ini – <span style="color:#555">${locationName}</span>`;
-        init();
-      },
-      async () => {
-        console.warn("Gagal mendeteksi lokasi, menggunakan default Jakarta");
-        const locationName = await getLocationName(LAT, LON);
-        document.querySelector("h2").innerHTML = `Cuaca Hari Ini – <span style="color:#555">${locationName}</span>`;
-        init();
-      }
-    );
-  } else {
-    console.warn("Geolocation tidak didukung browser");
-    init();
-  }
-}
-
 // Inisialisasi
-function init() {
-  showTodayWeather();
-  setupDatePicker();
-}
-
-detectLocation();
+setupDatePicker();
