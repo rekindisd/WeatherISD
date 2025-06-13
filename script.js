@@ -4,9 +4,18 @@ let LON = 106.8;
 function mapWeatherToIndoCategory(code) {
   if ([0, 1].includes(code)) return { label: "Cerah", icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png" };
   if ([2, 3, 45, 48].includes(code)) return { label: "Berawan", icon: "https://cdn-icons-png.flaticon.com/512/414/414825.png" };
-  if ([51, 53, 55, 61, 63, 66, 67, 71, 73, 77, 80, 81].includes(code)) return { label: "Hujan Ringan", icon: "https://cdn-icons-png.flaticon.com/512/1163/1163657.png" };
-  if ([65, 75, 82, 95, 96, 99].includes(code)) return { label: "Hujan Lebat", icon: "https://cdn-icons-png.flaticon.com/512/1146/1146869.png" };
-  return { label: "Tidak Diketahui", icon: "https://cdn-icons-png.flaticon.com/512/414/414825.png" };
+  if ([51, 53, 55, 56, 57, 61, 63, 66, 67, 71, 73, 77, 80, 81, 85, 86].includes(code)) return {
+    label: "Hujan Ringan",
+    icon: "https://cdn-icons-png.flaticon.com/512/1163/1163657.png"
+  };
+  if ([65, 82, 95, 96, 99].includes(code)) return {
+    label: "Hujan Lebat",
+    icon: "https://cdn-icons-png.flaticon.com/512/1146/1146869.png"
+  };
+  return {
+    label: `Kode tidak dikenali (${code})`,
+    icon: "https://cdn-icons-png.flaticon.com/512/414/414825.png"
+  };
 }
 
 async function fetchWeather(date) {
@@ -69,8 +78,8 @@ function detectLocation() {
         LON = pos.coords.longitude;
         init();
       },
-      (err) => {
-        console.warn("Gagal mendeteksi lokasi, gunakan default Jakarta");
+      () => {
+        console.warn("Gagal mendeteksi lokasi, menggunakan default Jakarta");
         init();
       }
     );
